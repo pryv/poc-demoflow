@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pryv demo flow</title>
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+          crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css"
+          href="https://fonts.googleapis.com/css?family=Roboto:300,400">
+    <link rel="stylesheet" type="text/css" href="https://sw.pryv.me/access/assets/css/style.css"/>
+    <script
+            src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="
+            crossorigin="anonymous"></script>
+</head>
+<style type="text/css">
+    .appView {
+        position: relative;
+        padding-bottom: 56.25%; /* proportion value to aspect ratio 16:9 (9 / 16 = 0.5625 or 56.25%) */
+        padding-top: 30px;
+        height: 0;
+        overflow: hidden;
+    }
+
+    .appView iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: none;
+    }
+    .btn-x {
+        width: 100%;
+    }
+</style>
+<body>
+
+<table id="login">
+    <tr><td width="100"></td>
+        <td width="100"><input type="text" id="username"></td>
+        <td width="100"><input type="password" id="password"></td>
+        <td width="50"><button type="button" class="btn btn-default  btn-x" onclick="login();">Login</button></td>
+    </tr>
+
+</table>
+
+<table id="navbar" width="100%" border="5" cellspacing="3" bordercolor="white" style="display: none">
+    <tr><td width="100"></td>
+        <td width="50"><button type="button" class="btn btn-default  btn-x" onclick="showPage('home');">H</button></td>
+        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('registration');">REG</button></td>
+        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('browser');">DATA</button></td>
+        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('browser', 'devices');">My devices</button></td>
+        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('campaignPatient');">My consents</button></td>
+        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('campaignManager');">Campaign Manager</button></td>
+        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('followed');">Data shared with me</button></td>
+        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('auditPage');">Audit</button></td>
+        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('blueButton');">Download all my Data</button></td>
+        <td></td></tr>
+</table>
+<hr>
+<div id="app" class="appView">
+</div>
+</body>
+<script>
+    var settings = {
+      domain: "pryv.me"
+    }
+
+    var pages = {
+      home: {url: "./home.html"},
+      registration: {url: "https://sw."+ settings.domain + "/access/register.html"},
+      browser: {url: "https://sw."+ settings.domain + "/access/signinhub.html"},
+      campaignPatient: {url: "https://pryv.github.io/app-web-campaign-manager/#/patientSignin"},
+      campaignManager: {url: "https://pryv.github.io/app-web-campaign-manager/"},
+      followed: {url: "./followedData.html"},
+      auditPage: {url: "./audit.html"},
+      blueButton: {url: "https://bluebutton.pryv.me/"}
+    };
+
+    var appDiv = document.getElementById('app');
+
+    for (var key in pages) {
+      appDiv.innerHTML += '<iframe id="' + key +'" \
+          title="' + key +'" \
+          frameborder="0" \
+          width="100%" height="100%"\
+          src="'+ pages[key].url +'"> \
+          </iframe>'
+    }
+
+    var current = null;
+    function showPage(key, sub) {
+      if (current) {current.style.display = 'none'}
+      current = document.getElementById(key);
+      current.style.display = 'block';
+      return false;
+    }
+
+
+    function login() {
+
+    }
+
+    showPage('home');
+
+    
+</script>
+
+</html>
