@@ -49,7 +49,7 @@
 </table>
 
 <table id="navbar" width="100%" border="5" cellspacing="3" bordercolor="white" style="display: none">
-    <tr><td width="50"><button type="button" class="btn btn-default  btn-x" onclick="logout();">Logout</button></td>
+    <tr><td width="50"><button type="button" class="btn btn-default  btn-x" onclick="logout();" id="logout">Logout</button></td>
         <td width="50"><button type="button" class="btn btn-default  btn-x" onclick="showPage('home');">H</button></td>
         <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('registration');">REG</button></td>
         <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('browser');">DATA</button></td>
@@ -106,15 +106,15 @@
 
       var username = $("#username").val();
       var password = $("#password").val();
-      
+
       pryv.Connection.login({
         username: username,
         password: password,
         domain: settings.domain,
         appId: 'pryv-demo'
       }, function(error, connection) {
-        console.log(error, connection);
 
+        setConnection(connection);
 
       });
 
@@ -126,18 +126,39 @@
       $('#login').show();
     }
 
+
+    function setConnection(connection) {
+      if (connection) {
+        console.log(connection);
+        settings.connection = connection;
+        $('#navbar').show();
+        $('#login').hide();
+        $('#logout').html(connection.username)
+      }
+    }
+
     showPage('home');
 
-
     // Who-ami to perfrom a single sign on
-      $.ajax({
-        dataType: "json",
-        url: 'https://' + settings.knownUname + '.' + settings.domain + '/auth/who-am-i',
-        data: null,
-        success: function (data) {
-          console.log(data);
+    pryv.utility.request({
+      method: 'GET',
+      host: settings.knownUname + '.' + settings.domain,
+      path: '/auth/who-am-i',
+      ssl: true,
+      success: function (data) {
+        console.log(data);
+        if (data && data.token) {
+          setConnection(new pryv.Connection({
+            username: data.username,
+            domain: settings.domain,
+            ssl: true,
+            auth: data.token,
+          }));
         }
-      });
+      }
+    });
+
+
 
 </script>
 
