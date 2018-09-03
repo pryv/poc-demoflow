@@ -48,7 +48,7 @@
 </table>
 
 <table id="navbar" width="100%" border="5" cellspacing="3" bordercolor="white" style="display: none">
-    <tr><td width="100"></td>
+    <tr><td width="50"><button type="button" class="btn btn-default  btn-x" onclick="logout();">Logout</button></td>
         <td width="50"><button type="button" class="btn btn-default  btn-x" onclick="showPage('home');">H</button></td>
         <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('registration');">REG</button></td>
         <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('browser');">DATA</button></td>
@@ -101,12 +101,18 @@
 
 
     function login() {
+      $('#navbar').show();
+      $('#login').hide();
+    }
 
+    function logout() {
+      $('#navbar').hide();
+      $('#login').show();
     }
 
     showPage('home');
 
-    
+
 </script>
 
 </html>
