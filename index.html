@@ -11,9 +11,10 @@
           href="https://fonts.googleapis.com/css?family=Roboto:300,400">
     <link rel="stylesheet" type="text/css" href="https://sw.pryv.me/access/assets/css/style.css"/>
     <script
-            src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-            integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="
+            src="https://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
             crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://api.pryv.com/lib-javascript/latest/pryv.js"></script>
 </head>
 <style type="text/css">
     .appView {
@@ -66,6 +67,7 @@
 </body>
 <script>
     var settings = {
+      knownUname: "toto22",
       domain: "pryv.me"
     }
 
@@ -101,8 +103,22 @@
 
 
     function login() {
-      $('#navbar').show();
-      $('#login').hide();
+
+      var username = $("#username").val();
+      var password = $("#password").val();
+      
+      pryv.Connection.login({
+        username: username,
+        password: password,
+        domain: settings.domain,
+        appId: 'pryv-demo'
+      }, function(error, connection) {
+        console.log(error, connection);
+
+
+      });
+
+
     }
 
     function logout() {
@@ -112,6 +128,16 @@
 
     showPage('home');
 
+
+    // Who-ami to perfrom a single sign on
+      $.ajax({
+        dataType: "json",
+        url: 'https://' + settings.knownUname + '.' + settings.domain + '/auth/who-am-i',
+        data: null,
+        success: function (data) {
+          console.log(data);
+        }
+      });
 
 </script>
 
