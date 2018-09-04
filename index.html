@@ -9,7 +9,7 @@
           crossorigin="anonymous">
     <link rel="stylesheet" type="text/css"
           href="https://fonts.googleapis.com/css?family=Roboto:300,400">
-    <link rel="stylesheet" type="text/css" href="https://sw.pryv.me/access/assets/css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="https://sw.pryv.me/access/css/style.css"/>
     <script
             src="https://code.jquery.com/jquery-3.3.1.min.js"
             integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
@@ -71,65 +71,58 @@
       domain: "pryv.me"
     }
 
-    var pages = {
-      home: {url: "./home.html"},
-      registration: {url: "https://sw."+ settings.domain + "/access/register.html"},
-      browser: {url: "https://sw."+ settings.domain + "/access/signinhub.html"},
-      campaignPatient: {url: "https://pryv.github.io/app-web-campaign-manager/#/patientSignin"},
-      campaignManager: {url: "https://pryv.github.io/app-web-campaign-manager/"},
-      followed: {url: "./followedData.html"},
-      auditPage: {url: "./audit.html"},
-      blueButton: {url: "https://bluebutton.pryv.me/"}
-    };
 
-    var appDiv = document.getElementById('app');
+    function loadPages()
+    {
 
-    for (var key in pages) {
-      appDiv.innerHTML += '<iframe id="' + key +'" \
-          title="' + key +'" \
+      var pages = {
+        home: {url: "./home.html"},
+        registration: {
+          url: "https://sw." + settings.domain + "/access/register.html"
+        },
+        browser: {url: "https://" + settings.connection.username + "." + settings.domain + "/"},
+        campaignPatient: {url: 'https://pryv.github.io/app-web-campaign-manager/#/patientAccount?pryvUsername=' + settings.connection.username + '&pryvToken=' + settings.connection.auth},
+        campaignManager: {url: "https://pryv.github.io/app-web-campaign-manager/"},
+        followed: {url: "./followedData.html"},
+        auditPage: {url: "./audit.html"},
+        blueButton: {url: "https://bluebutton.pryv.me/"}
+      };
+
+      var appDiv = document.getElementById('app');
+
+      for (var key in pages) {
+        appDiv.innerHTML += '<iframe id="' + key + '" \
+          title="' + key + '" \
           frameborder="0" \
           width="100%" height="100%"\
-          src="'+ pages[key].url +'"> \
+          src="' + pages[key].url + '"> \
           </iframe>'
+      }
     }
+
 
     var current = null;
     function showPage(key, sub) {
-      if (current) {current.style.display = 'none'}
+      if (current !== null) {
+        current.style.display = 'none'
+      }
       current = document.getElementById(key);
-      current.style.display = 'block';
+      if (current) {
+        current.style.display = 'block';
+      }
       return false;
     }
 
 
-    function login() {
-
-      var username = $("#username").val();
-      var password = $("#password").val();
-
-      pryv.Connection.login({
-        username: username,
-        password: password,
-        domain: settings.domain,
-        appId: 'pryv-demo'
-      }, function(error, connection) {
-
-        setConnection(connection);
-
-      });
 
 
-    }
 
-    function logout() {
-      if (settings.connection) {
-        settings.connection.trustedLogout({ error: function() {}, signedOut: function (done) {
-          $('#navbar').hide();
-          $('#login').show();
-        }});
-      }
-    }
 
+    showPage('home');
+
+    // -------------------------------------------------------------//
+    // -------------------- log in / out ---------------------------//
+    // -------------------------------------------------------------//
 
     function setConnection(connection) {
       if (connection) {
@@ -138,10 +131,35 @@
         $('#navbar').show();
         $('#login').hide();
         $('#logout').html(connection.username)
+        loadPages();
       }
     }
 
-    showPage('home');
+
+
+    function login() {
+      var username = $("#username").val();
+      var password = $("#password").val();
+      pryv.Connection.login({
+        username: username,
+        password: password,
+        domain: settings.domain,
+        appId: 'pryv-demo'
+      }, function(error, connection) {
+        setConnection(connection);
+      });
+    }
+
+    function logout() {
+      if (settings.connection) {
+        settings.connection.trustedLogout({ error: function() {}, signedOut: function (done) {
+            $('#navbar').hide();
+            $('#login').show();
+            settings.connection = null;
+          }});
+      }
+    }
+
 
     // Who-ami to perfrom a single sign on
     pryv.utility.request({
@@ -161,6 +179,7 @@
         }
       }
     });
+
 
 
 
