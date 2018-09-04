@@ -87,8 +87,8 @@
       registration: {
         url: "https://sw." + settings.domain + "/access/register.html"
       },
-      browser: {url: 'https://pryv.github.io/app-web/?username='+ settings.connection.username + '&domain=' + settings.domain + '&personaToken=' +  settings.connection.auth},
-      //browser: {url: 'https://l.rec.la:5443/?username='+ settings.connection.username + '&domain=' + settings.domain + '&personaToken=' +  settings.connection.auth},
+      //browser: {url: 'https://pryv.github.io/app-web/?username='+ settings.connection.username + '&domain=' + settings.domain + '&personaToken=' +  settings.connection.auth},
+      browser: {url: 'https://l.rec.la:5443/?username='+ settings.connection.username + '&domain=' + settings.domain + '&personaToken=' +  settings.connection.auth},
       campaignPatient: {url: 'https://pryv.github.io/app-web-campaign-manager/#/patientAccount?pryvUsername=' + settings.connection.username + '&pryvToken=' + settings.connection.auth},
       campaignManager: {url: "https://pryv.github.io/app-web-campaign-manager/"},
       followed: {url: "./followedData.html"},
@@ -118,6 +118,11 @@
     if (current) {
       current.style.display = 'block';
     }
+
+    if (key === 'browser') {
+      current.contentWindow.postMessage(sub, '*');
+    }
+
     return false;
   }
 
