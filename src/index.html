@@ -60,8 +60,8 @@
         <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('registration');">New user</button></td>
         <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('browser');">My Data</button></td>
         <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('browser', 'devices');">My devices</button></td>
-        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('campaignPatient');">My consents</button></td>
-        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('campaignManager');">Campaign Manager</button></td>
+        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('campaignPatient');">Given consents</button></td>
+        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('campaignManager');">Ask consents</button></td>
         <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('followed');">Data shared with me</button></td>
         <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('auditPage');">Audit</button></td>
         <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('blueButton');">Download all my Data</button></td>
@@ -87,7 +87,8 @@
       registration: {
         url: "https://sw." + settings.domain + "/access/register.html"
       },
-      browser: {url: "https://" + settings.connection.username + "." + settings.domain + "/"},
+      browser: {url: 'https://pryv.github.io/app-web/?username='+ settings.connection.username + '&domain=' + settings.domain + '&personaToken=' +  settings.connection.auth},
+      //browser: {url: 'https://l.rec.la:5443/?username='+ settings.connection.username + '&domain=' + settings.domain + '&personaToken=' +  settings.connection.auth},
       campaignPatient: {url: 'https://pryv.github.io/app-web-campaign-manager/#/patientAccount?pryvUsername=' + settings.connection.username + '&pryvToken=' + settings.connection.auth},
       campaignManager: {url: "https://pryv.github.io/app-web-campaign-manager/"},
       followed: {url: "./followedData.html"},
