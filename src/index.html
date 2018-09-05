@@ -58,11 +58,13 @@
     <tr><td width="50"><button type="button" class="btn btn-default  btn-x" onclick="logout();" id="logout">Logout</button></td>
         <td width="50"><button type="button" class="btn btn-default  btn-x" onclick="showPage('home');">Home</button></td>
         <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('registration');">New user</button></td>
-        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('browser');">My Data</button></td>
-        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('browser', 'devices');">My devices</button></td>
+        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('browser', 'clear');">My Data</button></td>
+        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('browser', 'settings');">My devices</button></td>
+        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('browser', 'sharings');">Shared Data</button></td>
         <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('campaignPatient');">Given consents</button></td>
         <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('campaignManager');">Ask consents</button></td>
-        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('followed');">Data shared with me</button></td>
+        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('browser', 'sharedata');">Data shared with me</button></td>
+        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('last20');">Last 20</button></td>
         <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('auditPage');">Audit</button></td>
         <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('blueButton');">Download all my Data</button></td>
         <td></td></tr>
@@ -92,6 +94,7 @@
       campaignPatient: {url: 'https://pryv.github.io/app-web-campaign-manager/#/patientAccount?pryvUsername=' + settings.connection.username + '&pryvToken=' + settings.connection.auth},
       campaignManager: {url: "https://pryv.github.io/app-web-campaign-manager/"},
       followed: {url: "./followedData.html"},
+      last20: {url: ""},
       auditPage: {url: "./audit.html"},
       blueButton: {url: "https://bluebutton.pryv.me/"}
     };
@@ -123,6 +126,10 @@
       current.contentWindow.postMessage(sub, '*');
     }
 
+    if (key === 'last20') {
+      reloadLast20();
+    }
+
     return false;
   }
 
@@ -130,10 +137,21 @@
     document.getElementById('app').innerHTML = '';
   }
 
+  function reloadLast20() {
+    var url = 'https://'+ settings.connection.username + '.' + settings.domain +
+      '/xevents?auth=' +  settings.connection.auth + '&format=html+head&fields[]=';
+
+    url += ['streamId', 'time', 'duration', 'type', 'content',
+      'tags', 'created', 'createdBy', 'modified', 'modifiedBy', 'attachments'].join('&fields[]=')
+
+    document.getElementById('last20').src = url;
+  }
 
 
 
   showPage('home');
+
+  // --- page specific helpers
 
   // -------------------------------------------------------------//
   // -------------------- log in / out ---------------------------//
