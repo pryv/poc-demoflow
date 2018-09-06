@@ -18,28 +18,33 @@
     <script type="text/javascript" src="https://api.pryv.com/lib-javascript/latest/pryv.js"></script>
 </head>
 <style type="text/css">
-    .appView {
-        position: relative;
-        padding-bottom: 56.25%; /* proportion value to aspect ratio 16:9 (9 / 16 = 0.5625 or 56.25%) */
-        padding-top: 30px;
-        height: 0;
-        overflow: hidden;
+    html, body {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+    }
+
+    #headspace {
+        height: 50px;
+    }
+
+    #app {
+        position: absolute;
+        top: 50px;
+        bottom: 0;
+        width: 100%;
     }
 
     .appView iframe {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
         display: none;
     }
+
     .btn-x {
         width: 100%;
     }
 </style>
 <body>
-
+<div id="headspace">
 <table id="login">
     <tr><td width="100"></td>
         <td width="100"><input type="text" id="username"></td>
@@ -51,17 +56,21 @@
 
 <table id="navbar" width="100%" border="5" cellspacing="3" bordercolor="white" style="display: none">
     <tr><td width="50"><button type="button" class="btn btn-default  btn-x" onclick="logout();" id="logout">Logout</button></td>
-        <td width="50"><button type="button" class="btn btn-default  btn-x" onclick="showPage('home');">H</button></td>
-        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('registration');">REG</button></td>
-        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('browser');">DATA</button></td>
-        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('browser', 'devices');">My devices</button></td>
-        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('campaignPatient');">My consents</button></td>
-        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('campaignManager');">Campaign Manager</button></td>
-        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('followed');">Data shared with me</button></td>
+        <td width="50"><button type="button" class="btn btn-default  btn-x" onclick="showPage('home');">Home</button></td>
+        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('registration');">New user</button></td>
+        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('browser', 'clear');">My Data</button></td>
+        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('browser', 'settings');">My devices</button></td>
+        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('browser', 'sharings');">Shared Data</button></td>
+        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('campaignPatient');">Given consents</button></td>
+        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('campaignManager');">Ask consents</button></td>
+        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('browser', 'sharedata');">Data shared with me</button></td>
+        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('browser', 'toCSV');">CSV export</button></td>
+        <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('last20');">Last 20</button></td>
         <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('auditPage');">Audit</button></td>
         <td width="100"><button type="button" class="btn btn-default  btn-x" onclick="showPage('blueButton');">Download all my Data</button></td>
         <td></td></tr>
 </table>
+</div>
 <hr>
 <div id="app" class="appView">
 </div>
@@ -81,10 +90,12 @@
       registration: {
         url: "https://sw." + settings.domain + "/access/register.html"
       },
-      browser: {url: "https://" + settings.connection.username + "." + settings.domain + "/"},
+      browser: {url: 'https://pryv.github.io/app-web/?username='+ settings.connection.username + '&domain=' + settings.domain + '&personaToken=' +  settings.connection.auth},
+      //browser: {url: 'https://l.rec.la:5443/?username='+ settings.connection.username + '&domain=' + settings.domain + '&personaToken=' +  settings.connection.auth},
       campaignPatient: {url: 'https://pryv.github.io/app-web-campaign-manager/#/patientAccount?pryvUsername=' + settings.connection.username + '&pryvToken=' + settings.connection.auth},
       campaignManager: {url: "https://pryv.github.io/app-web-campaign-manager/"},
       followed: {url: "./followedData.html"},
+      last20: {url: ""},
       auditPage: {url: "./audit.html"},
       blueButton: {url: "https://bluebutton.pryv.me/"}
     };
@@ -111,15 +122,37 @@
     if (current) {
       current.style.display = 'block';
     }
+
+    if (key === 'browser') {
+      current.contentWindow.postMessage(sub, '*');
+    }
+
+    if (key === 'last20') {
+      reloadLast20();
+    }
+
     return false;
+  }
+
+  function unloadPages() {
+    document.getElementById('app').innerHTML = '';
+  }
+
+  function reloadLast20() {
+    var url = 'https://'+ settings.connection.username + '.' + settings.domain +
+      '/xevents?auth=' +  settings.connection.auth + '&format=html+head&fields[]=';
+
+    url += ['streamId', 'time', 'duration', 'type', 'content',
+      'tags', 'created', 'createdBy', 'modified', 'modifiedBy', 'attachments'].join('&fields[]=')
+
+    document.getElementById('last20').src = url;
   }
 
 
 
-
-
-
   showPage('home');
+
+  // --- page specific helpers
 
   // -------------------------------------------------------------//
   // -------------------- log in / out ---------------------------//
@@ -133,6 +166,11 @@
       $('#login').hide();
       $('#logout').html(connection.username)
       loadPages();
+    } else {
+      $('#navbar').hide();
+      $('#login').show();
+      settings.connection = null;
+      unloadPages();
     }
   }
 
@@ -152,11 +190,9 @@
   }
 
   function logout() {
-    if (settings.connection) {
+    if (settings.connection && confirm('logout')) {
       settings.connection.trustedLogout({ error: function() {}, signedOut: function (done) {
-          $('#navbar').hide();
-          $('#login').show();
-          settings.connection = null;
+       setConnection(null);
         }});
     }
   }
