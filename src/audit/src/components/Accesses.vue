@@ -17,6 +17,8 @@
 
 
 <script>
+
+
   let users = [
     {
       name: 'Chris',
@@ -45,6 +47,11 @@
         users: users
       }
 
+    },
+    created () {
+      window.pryvConnection.accesses.get(function (err, res ) {
+          console.log(JSON.stringify(res));
+      });
     },
     methods:{
       GoToRoute : function(){

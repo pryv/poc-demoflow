@@ -10,13 +10,12 @@ import VueRouter from 'vue-router'
 Vue.use(VueRouter)
 //import the hello component
 import Main from './components/Main'
-import Accesses from './components/Accesses'
 
 
 //define your routes
 const routes = [
 //route for the home route of the web page
-  { path: '/', component: Main },
+  { path: '/X', component: Main },
 
 ]
 
@@ -28,7 +27,7 @@ const router = new VueRouter({
   mode: 'history'
 })
 
-new Vue({
+window.v = new Vue({
 //define the selector for the root component
   el: '#app',
   //pass the template to the root component
