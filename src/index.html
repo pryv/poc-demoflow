@@ -78,7 +78,7 @@
 </body>
 <script>
   var settings = {
-    knownUname: "toto22",
+    knownUname: "toto22", // this is a "bad" hack, to fix the fact that who-am-i requires a valid user when it does not.
     domain: "pryv.me"
   }
 
@@ -91,9 +91,9 @@
       registration: {
         url: "https://sw." + settings.domain + "/access/register.html"
       },
-      browser: {url: 'https://pryv.github.io/app-web/?username='+ settings.connection.username + '&domain=' + settings.domain + '&personalToken=' +  settings.connection.auth},
-      //browser: {url: 'https://l.rec.la:5443/?username='+ settings.connection.username + '&domain=' + settings.domain + '&personalToken=' +  settings.connection.auth},
-      plotly: {url: 'https://pryv.github.io/app-web-plotly/?username='+ settings.connection.username + '&domain=' + settings.domain + '&auth=' +  settings.connection.auth},
+        browser: {url: 'https://pryv.github.io/app-web/?username='+ settings.connection.username + '&domain=' + settings.domain + '&personalToken=' +  settings.connection.auth},
+      //  browser: {url: 'https://l.rec.la:5443/?username='+ settings.connection.username + '&domain=' + settings.domain + '&personalToken=' +  settings.connection.auth},
+        plotly: {url: 'https://pryv.github.io/app-web-plotly/?username='+ settings.connection.username + '&domain=' + settings.domain + '&auth=' +  settings.connection.auth},
       campaignPatient: {url: 'https://pryv.github.io/app-web-campaign-manager/#/patientAccount?pryvUsername=' + settings.connection.username + '&pryvToken=' + settings.connection.auth},
       campaignManager: {url: "https://pryv.github.io/app-web-campaign-manager/"},
       followed: {url: "./followedData.html"},
@@ -102,15 +102,30 @@
       blueButton: {url: "https://bluebutton.pryv.me/"}
     };
 
+    // if this user as a campaignManger account (fetch by checkAndLoadCampaignManagerAccount)
+    if (settings.campaignManager) {
+      pages.campaignManager.url += "#/account?username=" + settings.campaignManager.username + "&token=" + settings.campaignManager.token;
+    }
+
+
     var appDiv = document.getElementById('app');
 
     for (var key in pages) {
-      appDiv.innerHTML += '<iframe id="' + key + '" \
+
+      var page = document.getElementById(key);
+      if (page) {
+        page.src = pages[key].url;
+        console.log('reloaded page: ' + key);
+      } else {
+        appDiv.innerHTML += '<iframe id="' + key + '" \
           title="' + key + '" \
           frameborder="0" \
           width="100%" height="100%"\
           src="' + pages[key].url + '"> \
           </iframe>'
+
+        console.log('added page: ' + key);
+      }
     }
   }
 
@@ -138,6 +153,7 @@
 
   function unloadPages() {
     document.getElementById('app').innerHTML = '';
+
   }
 
   function reloadLast20() {
@@ -167,7 +183,10 @@
       $('#navbar').show();
       $('#login').hide();
       $('#logout').html(connection.username)
-      loadPages();
+      checkAndLoadCampaignManagerAccount(connection, function() {
+
+        loadPages();
+      });
     } else {
       $('#navbar').hide();
       $('#login').show();
@@ -219,6 +238,14 @@
     }
   });
 
+  function checkAndLoadCampaignManagerAccount(connection, done) {
+    connection.profile.getPrivate('campaign-manager', function(error, result) {
+      if (result && result.username) {
+        settings.campaignManager = result;
+        done();
+      }
+    });
+  }
 
 
 
