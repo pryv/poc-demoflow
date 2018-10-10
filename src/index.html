@@ -83,6 +83,9 @@
   }
 
 
+  /**
+   * Load all iFrames, done after log-in
+   */
   function loadPages()
   {
 
@@ -93,10 +96,9 @@
       },
         browser: {url: 'https://pryv.github.io/app-web/?username='+ settings.connection.username + '&domain=' + settings.domain + '&personalToken=' +  settings.connection.auth},
       //  browser: {url: 'https://l.rec.la:5443/?username='+ settings.connection.username + '&domain=' + settings.domain + '&personalToken=' +  settings.connection.auth},
-        plotly: {url: 'https://pryv.github.io/app-web-plotly/?username='+ settings.connection.username + '&domain=' + settings.domain + '&auth=' +  settings.connection.auth},
+      plotly: {url: 'https://pryv.github.io/app-web-plotly/?username='+ settings.connection.username + '&domain=' + settings.domain + '&auth=' +  settings.connection.auth},
       campaignPatient: {url: 'https://pryv.github.io/app-web-campaign-manager/#/patientAccount?pryvUsername=' + settings.connection.username + '&pryvToken=' + settings.connection.auth},
       campaignManager: {url: "https://pryv.github.io/app-web-campaign-manager/"},
-      followed: {url: "./followedData.html"},
       last20: {url: ""},
       auditPage: {url: "./audit.html"},
       blueButton: {url: "https://bluebutton.pryv.me/"}
@@ -129,7 +131,7 @@
     }
   }
 
-
+  // current is the actually shown iFrame
   var current = null;
   function showPage(key, sub) {
     if (current !== null) {
@@ -167,7 +169,7 @@
   }
 
 
-
+  // first page to show
   showPage('home');
 
   // --- page specific helpers
@@ -184,7 +186,6 @@
       $('#login').hide();
       $('#logout').html(connection.username)
       checkAndLoadCampaignManagerAccount(connection, function() {
-
         loadPages();
       });
     } else {
