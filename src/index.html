@@ -243,8 +243,8 @@
     connection.profile.getPrivate('campaign-manager', function(error, result) {
       if (result && result.username) {
         settings.campaignManager = result;
-        done();
       }
+      done();
     });
   }
 
