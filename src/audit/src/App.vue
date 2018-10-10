@@ -9,7 +9,7 @@
       </div>
       <div v-else>
         <div v-if="state == 'nok'">
-          Failed 
+          Failed
         </div>
         <div v-else>
           Audit for user: {{username}}

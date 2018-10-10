@@ -15,7 +15,7 @@ import Main from './components/Main'
 //define your routes
 const routes = [
 //route for the home route of the web page
-  { path: '/X', component: Main },
+  { path: '/', component: Main },
 
 ]
 
