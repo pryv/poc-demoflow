@@ -1,17 +1,35 @@
 <template>
-  <table border="1">
-    <tr>
-      <th v-for="field in fields">
-        {{ field.title }}
-      </th>
-    <tr>
+  <v-data-table
+    v-model="selected"
+    :headers="fields"
+    :items="accesses"
+    :pagination.sync="pagination"
+    select-all
+    item-key="name"
+    class="elevation-1"
+  >
+    <template slot="headers" slot-scope="props">
+      <tr>
+        <th
+          v-for="header in props.headers"
+          :key="header.name"
+          :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.name === pagination.sortBy ? 'active' : '']"
+          @click="changeSort(header.key)"
+        >
+          <v-icon small>arrow_upward</v-icon>
+          {{ header.title }}
+        </th>
+      </tr>
+    </template>
+    <template slot="items" slot-scope="props">
+      <tr :active="props.selected" @click="props.selected = !props.selected">
+        <td v-for="field in fields" class="text-xs-left">
+          {{ field.display(props.item) }}
+        </td>
+      </tr>
+    </template>
+  </v-data-table>
 
-    <tr v-for="access in accesses">
-      <td v-for="field in fields">
-        {{ field.display(access) }}
-      </td>
-    </tr>
-  </table>
 </template>
 
 
@@ -102,6 +120,7 @@
   ]
 
 
+
   export default {
     name: 'Accesses',
     data () {
@@ -109,7 +128,13 @@
         username: window.pryvUsername,
         UserInput :'',
         accesses: this.accesses,
-        fields: fields
+        fields: fields,
+        pagination: {
+          sortBy: 'name',
+          rowsPerPage: 15
+
+        },
+        selected: []
       }
 
     },
@@ -133,6 +158,18 @@
     methods:{
       GoToRoute : function(){
         this.$router.push({ name: 'Paramdetails', params: { id: this.UserInput }})
+      },
+      toggleAll () {
+        if (this.selected.length) this.selected = []
+        else this.selected = this.accesses.slice()
+      },
+      changeSort (column) {
+        if (this.pagination.sortBy === column) {
+          this.pagination.descending = !this.pagination.descending
+        } else {
+          this.pagination.sortBy = column
+          this.pagination.descending = false
+        }
       }
     }
   }

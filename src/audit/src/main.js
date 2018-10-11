@@ -2,6 +2,13 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 //import the vue instance
 import Vue from 'vue'
+
+import Vuetify from 'vuetify'
+
+Vue.use(Vuetify)
+
+import 'vuetify/dist/vuetify.min.css' // Ensure you are using css-loader
+
 //import the App component
 import App from './App'
 //import the vue router
@@ -10,6 +17,7 @@ import VueRouter from 'vue-router'
 Vue.use(VueRouter)
 //import the hello component
 import Main from './components/Main'
+
 
 
 //define your routes
