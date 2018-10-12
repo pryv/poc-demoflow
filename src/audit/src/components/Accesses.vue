@@ -32,7 +32,7 @@
       <v-card flat>
         <v-list two-line>
           <template v-for="detail in details">
-            <v-list-tile >
+            <v-list-tile v-if="detail.display(props.item) !== '-'">
               <v-list-tile-content>
                 <span class='text--primary'>{{ detail.title }}</span>&mdash; {{ detail.display(props.item)}}
               </v-list-tile-content>

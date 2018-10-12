@@ -13,7 +13,7 @@
         </div>
         <div v-else>
           Audit for user: {{username}}
-          <router-link v-bind:to="'/'">Main</router-link>
+          <router-link v-bind:to="'/audit'">Accesses</router-link>
           <router-view></router-view>
         </div>
       </div>

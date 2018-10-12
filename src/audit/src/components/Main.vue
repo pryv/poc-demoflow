@@ -1,18 +1,13 @@
 <template>
   <div id="main">
-    Hello
-
-    <Accesses/>
+   <Accesses/>
   </div>
-
-
 </template>
 
 <script>
   import Accesses from './Accesses.vue'
   export default {
     name: 'main',
-
     components: {
       Accesses
     }
