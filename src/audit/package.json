@@ -13,6 +13,7 @@
     "pryv": "^1.0.8",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1",
+    "vue-splitpane": "^1.0.2",
     "vuetify": "^1.2.9"
   },
   "devDependencies": {

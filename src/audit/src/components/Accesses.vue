@@ -5,14 +5,14 @@
     :items="accesses"
     :pagination.sync="pagination"
     select-all
-    item-key="name"
+    item-key="id"
     class="elevation-1"
   >
     <template slot="headers" slot-scope="props">
       <tr>
         <th
           v-for="header in props.headers"
-          :key="header.name"
+          :key="header.key"
           :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.name === pagination.sortBy ? 'active' : '']"
           @click="changeSort(header.key)"
         >
@@ -22,7 +22,7 @@
       </tr>
     </template>
     <template slot="items" slot-scope="props">
-      <tr :active="props.selected" @click="props.expanded = !props.expanded">
+      <tr :active="props.selected" @click="props.expanded = !props.expanded; onSelect(props.item)">
         <td v-for="field in fields" class="text-xs-left">
           {{ field.display(props.item) }}
         </td>
@@ -125,6 +125,14 @@
       key: 'deleted',
       title: 'Status',
       display: displayDeleted
+    }
+    ];
+
+  const details = [
+    {
+      key: 'permission',
+      title: 'Permissions',
+      display: displayPermission,
     },
     {
       key: 'created',
@@ -135,10 +143,7 @@
       key: 'createdBy',
       title: 'Created By',
       display: displayBy('createdBy')
-    }
-    ];
-
-  const details = [
+    },
     {
       key: 'modified',
       title: 'Modification Date',
@@ -148,18 +153,16 @@
       key: 'modifiedBy',
       title: 'Modified By',
       display: modifiedBy,
-    },
-    {
-      key: 'permission',
-      title: 'Permissions',
-      display: displayPermission,
     }
   ];
 
-
+  var selectedItem = null;
 
   export default {
     name: 'Accesses',
+    props: [
+      'onSelectProp'
+    ],
     data () {
       return {
         username: window.pryvUsername,
@@ -177,14 +180,11 @@
 
     },
     computed: {
-      accesses() {
-        return this.accesses;
-      }
+
     },
     created () {
       var that = this;
       window.pryvConnection.accesses.get(function (err, res ) {
-          console.log(JSON.stringify(res));
           if (res) {
             that.accesses = res;
             that.accesses.forEach(function (access) {
@@ -197,10 +197,6 @@
       GoToRoute : function(){
         this.$router.push({ name: 'Paramdetails', params: { id: this.UserInput }})
       },
-      toggleAll () {
-        if (this.selected.length) this.selected = []
-        else this.selected = this.accesses.slice()
-      },
       changeSort (column) {
         if (this.pagination.sortBy === column) {
           this.pagination.descending = !this.pagination.descending
@@ -208,6 +204,12 @@
           this.pagination.sortBy = column
           this.pagination.descending = false
         }
+      },
+      onSelect (item) {
+        if (item === selectedItem) return;
+        selectedItem = item;
+        if (this.onSelectProp) this.onSelectProp(selectedItem);
+        console.log('Accesses selected ' + item.name + ' > ' + item.id);
       }
     }
   }
