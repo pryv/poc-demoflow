@@ -23,16 +23,14 @@ import Main from './components/Main'
 //define your routes
 const routes = [
 //route for the home route of the web page
-  { path: '/audit', component: Main },
+  { path: '/', component: Main },
 
 ]
 
-// Create the router instance and pass the `routes` option
-// You can pass in additional options here, but let's
-// keep it simple for now.
 const router = new VueRouter({
+  base: window.location.pathname,
   routes, // short for routes: routes
-  mode: 'history'
+  mode: 'hash'
 })
 
 window.v = new Vue({

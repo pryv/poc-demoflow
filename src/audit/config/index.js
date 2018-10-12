@@ -43,7 +43,7 @@ module.exports = {
     // Paths
     assetsRoot: path.resolve(__dirname, '../../../gh-pages/audit'),
     assetsSubDirectory: 'static',
-    assetsPublicPath: '/audit/',
+    assetsPublicPath: './',
 
     /**
      * Source Maps
