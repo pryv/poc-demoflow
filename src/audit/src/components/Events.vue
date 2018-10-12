@@ -156,8 +156,9 @@
         fields: fields,
         details: details,
         pagination: {
-          sortBy: 'name',
-          rowsPerPage: 15
+          sortBy: 'modified',
+          descending: true,
+          rowsPerPage: 9
 
         },
         selected: []

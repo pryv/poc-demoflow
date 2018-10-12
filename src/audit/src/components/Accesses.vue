@@ -107,6 +107,11 @@
 
   const fields = [
     {
+      key: 'lastUsed',
+      title: 'Last Usage',
+      display: displayDate('lastUsed')
+    },
+    {
       key: 'name',
       title: 'Name',
       display: displayRaw('name')
@@ -115,11 +120,6 @@
       key: 'type',
       title: 'Type',
       display: displayType
-    },
-    {
-      key: 'lastUsed',
-      title: 'Last Usage',
-      display: displayDate('lastUsed')
     },
     {
       key: 'deleted',
@@ -171,8 +171,9 @@
         fields: fields,
         details: details,
         pagination: {
-          sortBy: 'name',
-          rowsPerPage: 15
+          sortBy: 'lastUsed',
+          descending: true,
+          rowsPerPage: 10
 
         },
         selected: []
