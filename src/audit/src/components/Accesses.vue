@@ -22,25 +22,11 @@
       </tr>
     </template>
     <template slot="items" slot-scope="props">
-      <tr :active="props.selected" @click="props.expanded = !props.expanded; onSelect(props.item)">
+      <tr :active="props.selected" @click="onSelect(props.item)">
         <td v-for="field in fields" class="text-xs-left">
           {{ field.display(props.item) }}
         </td>
       </tr>
-    </template>
-    <template slot="expand" slot-scope="props">
-      <v-card flat>
-        <v-list two-line>
-          <template v-for="detail in details">
-            <v-list-tile v-if="detail.display(props.item) !== '-'">
-              <v-list-tile-content>
-                <span class='text--primary'>{{ detail.title }}</span>&mdash; {{ detail.display(props.item)}}
-              </v-list-tile-content>
-            </v-list-tile>
-          </template>
-        </v-list>
-        <v-card-text></v-card-text>
-      </v-card>
     </template>
   </v-data-table>
 
@@ -85,25 +71,12 @@
     }
   }
 
-  function modifiedDate (access) {
-    if (access.modified !== access.created) return displayDate('modified')(access);
-    return '-';
-  }
-
-  function modifiedBy(access) {
-    if (access.modifiedBy !== access.createdBy) return displayBy('modified')(access);
-    return '-';
-  }
-
   function displayDeleted(access) {
     if (access.deleted === null) return 'Expired';
     return 'Valid';
   }
 
-  function displayPermission(access) {
-    if (access.type === 'personal') return 'System or Owner';
-    return access.permissions;
-  }
+
 
   const fields = [
     {
@@ -128,33 +101,8 @@
     }
     ];
 
-  const details = [
-    {
-      key: 'permission',
-      title: 'Permissions',
-      display: displayPermission,
-    },
-    {
-      key: 'created',
-      title: 'Creation Date',
-      display: displayDate('created')
-    },
-    {
-      key: 'createdBy',
-      title: 'Created By',
-      display: displayBy('createdBy')
-    },
-    {
-      key: 'modified',
-      title: 'Modification Date',
-      display: modifiedDate,
-    },
-    {
-      key: 'modifiedBy',
-      title: 'Modified By',
-      display: modifiedBy,
-    }
-  ];
+
+
 
   var selectedItem = null;
 
@@ -169,7 +117,6 @@
         UserInput :'',
         accesses: this.accesses,
         fields: fields,
-        details: details,
         pagination: {
           sortBy: 'lastUsed',
           descending: true,
@@ -208,7 +155,14 @@
       },
       onSelect (item) {
         if (item === selectedItem) return;
+
+        // add createdByName and modifiedByName
+        item.createdByName = displayBy('createdBy')(item);
+        item.modifiedByName = displayBy('modifiedBy')(item);
+
         selectedItem = item;
+
+
         if (this.onSelectProp) this.onSelectProp(selectedItem);
         console.log('Accesses selected ' + item.name + ' > ' + item.id);
       }
