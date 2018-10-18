@@ -207,7 +207,9 @@
       domain: settings.domain,
       appId: 'pryv-demo'
     }, function(error, connection) {
+
       setConnection(connection);
+      setPersonalTokenAsDomainCookie(username, connection.settings.auth, settings.domain, 'pryv-demo');
     });
   }
 
@@ -215,29 +217,38 @@
     if (settings.connection && confirm('logout')) {
       settings.connection.trustedLogout({ error: function() {}, signedOut: function (done) {
        setConnection(null);
-        }});
+       setPersonalTokenAsDomainCookie(null);
+      }});
     }
   }
 
 
-  // Who-ami to perfrom a single sign on
-  pryv.utility.request({
-    method: 'GET',
-    host: settings.knownUname + '.' + settings.domain,
-    path: '/auth/who-am-i',
-    ssl: true,
-    success: function (data) {
-      console.log(data);
-      if (data && data.token) {
-        setConnection(new pryv.Connection({
-          username: data.username,
-          domain: settings.domain,
-          ssl: true,
-          auth: data.token,
-        }));
+  var pryvSSO = getPersonalTokenFromDomainCookie();
+
+  if (pryvSSO) { // test if valid
+    pryv.utility.request({
+      method: 'GET',
+      host: pryvSSO.username + '.' + pryvSSO.domain,
+      path: '/access-info',
+      ssl: true,
+      headers: {'Authorization': pryvSSO.auth},
+      success: function (data) {
+        console.log(data);
+        if (data && data.type && data.type === 'personal') {
+          setConnection(new pryv.Connection({
+            username: pryvSSO.username,
+            domain: pryvSSO.domain,
+            ssl: true,
+            auth: pryvSSO.auth,
+          }));
+        }
       }
-    }
-  });
+    });
+  }
+
+  // check pryv-sso document cookie.
+
+
 
   function checkAndLoadCampaignManagerAccount(connection, done) {
     connection.profile.getPrivate('campaign-manager', function(error, result) {
@@ -248,6 +259,50 @@
     });
   }
 
+  // ------------------------------------------------
+  // who-am-i replacement with client side cookies
+  // ------------------------------------------------
+
+  function getPersonalTokenFromDomainCookie() {
+    return getDomainCookie('pryvsso');
+  }
+
+  function setPersonalTokenAsDomainCookie(username, auth, domain, appId) {
+    var value = username ?  {username: username, auth: auth, domain: domain, appId: appId} : null;
+    setDomainCookie('pryvsso',value);
+  }
+
+  function setDomainCookie(cname, value) {
+    console.log(value);
+    var myDate = new Date();
+    var hostName = window.location.hostname;
+    var domain = hostName.substring(hostName.lastIndexOf(".", hostName.lastIndexOf(".") - 1) + 1);
+    myDate.setMonth(myDate.getMonth() + 12);
+    document.cookie = cname +"=" + encodeURIComponent(JSON.stringify(value))
+      + ";expires=" + myDate
+      + ';domain=.' + domain + ';path=/';
+  }
+
+
+  function getDomainCookie(cname) {
+    var name = cname + "=";
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var ca = decodedCookie.split(';');
+    for(var i = 0; i <ca.length; i++) {
+      var c = ca[i];
+      while (c.charAt(0) == ' ') {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) == 0) {
+        try {
+          return JSON.parse(c.substring(name.length, c.length));
+        } catch (e) {
+          console.log("Error while parsing cookie: "+ cname);
+        }
+      }
+    }
+    return null;
+  }
 
 
 </script>
