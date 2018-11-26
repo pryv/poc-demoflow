@@ -38,6 +38,11 @@
       display: displayPermission,
     },
     {
+      key: 'clientData',
+      title: 'Informations',
+      display: displayClientData,
+    },
+    {
       key: 'created',
       title: 'Creation Date',
       display: displayDate('created')
@@ -72,6 +77,11 @@
     }
   }
 
+
+  function displayClientData (access) {
+    if (access.clientData) return access.clientData;
+    return '-';
+  }
 
 
   function modifiedDate (access) {
