@@ -10,6 +10,7 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "marked": "^0.5.2",
     "pryv": "^1.0.8",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1",

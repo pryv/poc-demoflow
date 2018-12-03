@@ -15,7 +15,7 @@
                 <ol v-for="detail in details">
                   <li v-if="detail.display(access) !== '-'"
                       class="grey--text"
-                      style="white-space:nowrap; text-align: center;"><B>{{ detail.title }}</B> &mdash; {{ detail.display(access)}}</li>
+                      style="white-space:nowrap; text-align: center;"><B>{{ detail.title }}</B> &mdash; <span v-html="detail.display(access)"/></li>
                 </ol>
 
         </div>
@@ -30,6 +30,10 @@
 
 
 <script>
+
+
+  import marked from 'marked';
+
   // ----- Access detail ------ //
   const details = [
     {
@@ -79,7 +83,12 @@
 
 
   function displayClientData (access) {
-    if (access.clientData) return access.clientData;
+    if (access.clientData) {
+      if (access.clientData['app-web-auth:description']) {
+        return  marked(access.clientData['app-web-auth:description'].content);
+      }
+      return marked(access.clientData);
+    }
     return '-';
   }
 
