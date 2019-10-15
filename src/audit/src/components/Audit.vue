@@ -2,7 +2,7 @@
   <v-data-table
     v-model="selected"
     :headers="fields"
-    :items="events"
+    :items="auditLogs"
     :pagination.sync="pagination"
     select-all
     item-key="id"
@@ -48,63 +48,30 @@
 
 <script>
 
-  var eventsMap = {};
+  var auditLogsMap = {};
 
-
-  function displayType (event) {
-    return event.type;
+  function displayRaw(auditLog) {
+    return auditLog;
   }
 
-  function displayRaw (key) {
-    return function (event) {
-      return event[key];
-    }
+  function displayDate (auditLog) {
+    var date = new Date(auditLog.time * 1000);
+    return date.toLocaleString();
   }
 
-  function displayDate (key) {
-    return function (event) {
-      var date = new Date(event[key] * 1000);
-      return date.toLocaleString();
-    }
+  function displayStatus(auditLog) {
+    return auditLog.status;
   }
 
-
-
-  function displayPermission(event) {
-    if (event.type === 'personal') return 'System or Owner';
-    return event.permissions;
-  }
-
-  function displayStream(event) {
-    return event.stream.name;
-  }
-
-  function displayTags(event) {
-    if (!event.tags || event.tags.length == 0) return '-';
-    return JSON.stringify(event.tags);
-  }
-
-  function displayAction(event) {
-    if (event.deleted) return 'Delete';
-    if (event.trashed) return 'Trashed';
-    if (event.created === event.modified) return 'Create';
-    return 'Modify';
-  }
-
-  function displayAttachments(event) {
-    if (!event.attachments || event.attachments.length == 0) return '-';
-    var res = '<li>';
-    event.attachments.forEach(function (attachment) {
-      res += '<el><a target="_new" href="' + event.attachmentUrl(attachment) + '">' + attachment.fileName + '</a></el>';
-    });
-    return res + '</li>';
+  function displayAction(auditLog) {
+    return auditLog.action;
   }
 
   const fields = [
     {
-      key: 'modified',
-      title: 'Action Date',
-      display: displayDate('modified'),
+      key: 'date',
+      title: 'Date',
+      display: displayDate,
     },
     {
       key: 'action',
@@ -112,39 +79,23 @@
       display: displayAction
     },
     {
-      key: 'streamId',
-      title: 'Stream',
-      display: displayStream
-    },
-    {
-      key: 'eventType',
-      title: 'Type',
-      display: displayType
+      key: 'status',
+      title: 'Status',
+      display: displayStatus
     }
     ];
 
   const details = [
     {
       key: 'content',
-      title: 'Content',
-      display: displayRaw('content')
-    },
-    {
-      key: 'tags',
-      title: 'Tags',
-      display: displayTags
-    },
-    {
-      key: 'attachments',
-      title: 'Attachments',
-      display: displayAttachments
+      display: displayRaw
     }
   ];
 
   var selectedItem = null;
 
   export default {
-    name: 'events',
+    name: 'auditLogs',
     props: [
       'onSelectProp'
     ],
@@ -152,11 +103,11 @@
       return {
         username: window.pryvUsername,
         UserInput :'',
-        events: this.events,
+        auditLogs: this.auditLogs,
         fields: fields,
         details: details,
         pagination: {
-          sortBy: 'modified',
+          sortBy: 'date',
           descending: true,
           rowsPerPage: 9
 
@@ -169,7 +120,7 @@
 
     },
     created () {
-      this.events = [];
+      this.auditLogs = [];
     },
     methods:{
       changeSort (column) {
@@ -184,14 +135,12 @@
         if (item === selectedItem) return;
         selectedItem = item;
         if (this.onSelectProp) this.onSelectProp(selectedItem);
-        console.log('events selected ' + item.name + ' > ' + item.id);
+        console.log('audit log selected ' + item.id);
       },
-      setEvents (events) {
-        this.events = events;
+      setAuditLogs (auditLogs) {
+        this.auditLogs = auditLogs;
       }
     }
   }
-
-
 
 </script>
