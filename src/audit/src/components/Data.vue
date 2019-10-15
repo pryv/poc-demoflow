@@ -22,7 +22,7 @@
         <div v-else>
           <H3>-</H3>
         </div>
-        <Events ref="eventsView"/>
+        <Audit ref="auditView"/>
       </div>
     </div>
   </div>
@@ -33,6 +33,7 @@
 
 
   import marked from 'marked';
+  import request from 'superagent';
 
   // ----- Access detail ------ //
   const details = [
@@ -108,18 +109,18 @@
     return access.permissions;
   }
 
-  // ----- Events ------------- //
-  import Events from './Events.vue'
+  // ----- Audit ------------- //
+  import Audit from './Audit.vue'
 
-  var eventsCache = null;
-  var eventsMap = {}; // by modifiedBy
+  var auditLogsCache = null;
+  var auditLogsMap = {}; // by accessId
   export default {
     name: 'Data',
     props: [
 
     ],
     components: {
-      Events
+      Audit
     },
     data () {
       return {
@@ -137,33 +138,38 @@
       this.connection =  window.pryvConnection;
       this.state = 'loading';
       var that = this;
-      this.connection.events.get({
-        limit: 10000,
-        includeDeletions: true,
-        modifiedSince: ((new Date().getMilliseconds() / 1000) - 60*60*24*100)
-      }, function (error, events) {
-        if (error) {
-          that.state = 'nok';
-        } else {
-          eventsCache = events;
-          eventsCache.forEach(function(event) {
-            var modifiedBy = event.modifiedBy;
-            if (! eventsMap[modifiedBy]) eventsMap[modifiedBy] = [];
-            eventsMap[modifiedBy].push(event);
+
+      const connectionSettings = this.connection.settings;
+      const auth = connectionSettings.auth;
+      const username = connectionSettings.username;
+      const domain = connectionSettings.domain;
+
+      request
+        .get(`https://${username}.${domain}/audit/logs`)
+        .set('Authorization', auth)
+        .then(res => {
+          auditLogsCache = res.body.auditLogs;
+          auditLogsCache.forEach(function(auditLog) {
+            const accessId = auditLog.accessId;
+            if (! auditLogsMap[accessId]) auditLogsMap[accessId] = [];
+            auditLogsMap[accessId].push(auditLog);
           });
           that.state = 'ok';
-        }
-      });
+        })
+        .catch(err => {
+          console.log(err);
+          that.state = 'nok';
+        });
     },
     methods:{
       selectAccess : function(access){
         this.access = access;
-        this.$refs.eventsView.setEvents(this.eventsForAccess(access));
+        this.$refs.auditView.setAuditLogs(this.auditLogsForAccess(access));
         console.log('Data selected Access:' + access.name);
       },
-      eventsForAccess: function(access) {
-        if (this.access === null || (! eventsMap) || (! eventsMap[access.id])) return [];
-        return eventsMap[access.id];
+      auditLogsForAccess: function(access) {
+        if (this.access === null || (! auditLogsMap) || (! auditLogsMap[access.id])) return [];
+        return auditLogsMap[access.id];
       }
     }
   }
