@@ -12,17 +12,18 @@
         <div v-if="access">
               <div class="headline">{{ access.name }}</div>
 
-                <ol v-for="detail in details">
+                <ul v-for="detail in details">
                   <li v-if="detail.display(access) !== '-'"
                       class="grey--text"
                       style="white-space:nowrap; text-align: center;"><B>{{ detail.title }}</B> &mdash; <span v-html="detail.display(access)"/></li>
-                </ol>
+                </ul>
 
         </div>
         <div v-else>
           <H3>-</H3>
         </div>
-        <Audit ref="auditView"/>
+        <Audit
+          :auditLogs="auditLogs"/>
       </div>
     </div>
   </div>
@@ -112,8 +113,6 @@
   // ----- Audit ------------- //
   import Audit from './Audit.vue'
 
-  var auditLogsCache = null;
-  var auditLogsMap = {}; // by accessId
   export default {
     name: 'Data',
     props: [
@@ -124,6 +123,8 @@
     },
     data () {
       return {
+        auditLogs: [],
+        auditLogsMap: {}, // by accessId
         access: this.selectedAccess,
         connection: this.connection,
         state: 'loading',
@@ -136,40 +137,41 @@
     created () {
       this.access = null;
       this.connection =  window.pryvConnection;
-      this.state = 'loading';
-      var that = this;
-
-      const connectionSettings = this.connection.settings;
-      const auth = connectionSettings.auth;
-      const username = connectionSettings.username;
-      const domain = connectionSettings.domain;
-
-      request
-        .get(`https://${username}.${domain}/audit/logs`)
-        .set('Authorization', auth)
-        .then(res => {
-          auditLogsCache = res.body.auditLogs;
-          auditLogsCache.forEach(function(auditLog) {
-            const accessId = auditLog.accessId;
-            if (! auditLogsMap[accessId]) auditLogsMap[accessId] = [];
-            auditLogsMap[accessId].push(auditLog);
-          });
-          that.state = 'ok';
-        })
-        .catch(err => {
-          console.log(err);
-          that.state = 'nok';
-        });
+      this.state = 'ok';
     },
     methods:{
       selectAccess : function(access){
-        this.access = access;
-        this.$refs.auditView.setAuditLogs(this.auditLogsForAccess(access));
         console.log('Data selected Access:' + access.name);
-      },
-      auditLogsForAccess: function(access) {
-        if (this.access === null || (! auditLogsMap) || (! auditLogsMap[access.id])) return [];
-        return auditLogsMap[access.id];
+        this.access = access;
+
+        if (this.access == null || this.auditLogsMap == null) {
+          return this.auditLogs = [];
+        }
+        if (this.auditLogsMap[access.id] != null) {
+          return this.auditLogs = this.auditLogsMap[access.id];
+        }
+
+        this.state = 'loading';
+        let self = this;
+
+        const connectionSettings = this.connection.settings;
+        const auth = connectionSettings.auth;
+        const username = connectionSettings.username;
+        const domain = connectionSettings.domain;
+
+        request
+          .get(`https://${username}.${domain}/audit/logs?accessId=${access.id}`)
+          .set('Authorization', auth)
+          .then(function(res) {
+            const logs = res.body.auditLogs;
+            self.auditLogsMap[access.id] = logs;
+            self.auditLogs = logs;
+            self.state = 'ok';
+          })
+          .catch(function (err) {
+            console.log(err);
+            self.state = 'nok';
+          });
       }
     }
   }

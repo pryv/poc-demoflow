@@ -8,10 +8,10 @@
     item-key="id"
     class="elevation-1"
   >
-    <template slot="headers" slot-scope="props">
+    <template slot="headers" slot-scope="properties">
       <tr>
         <th
-          v-for="header in props.headers"
+          v-for="header in properties.headers"
           :key="header.key"
           :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.name === pagination.sortBy ? 'active' : '']"
           @click="changeSort(header.key)"
@@ -21,23 +21,23 @@
         </th>
       </tr>
     </template>
-    <template slot="items" slot-scope="props">
-      <tr :active="props.selected" @click="props.expanded = !props.expanded; onSelect(props.item)">
+    <template slot="items" slot-scope="properties">
+      <tr :active="properties.selected" @click="properties.expanded = !properties.expanded; onSelect(properties.item)">
         <td v-for="field in fields" class="text-xs-left">
-          {{ field.display(props.item) }}
+          {{ field.display(properties.item) }}
         </td>
       </tr>
     </template>
-    <template slot="expand" slot-scope="props">
+    <template slot="expand" slot-scope="properties">
       <v-card flat>
-        <v-list two-line>
-          <template v-for="detail in details">
-            <v-list-tile v-if="detail.display(props.item) !== '-'">
-              <v-list-tile-content class='text--primary'>{{ detail.title }}</span><span v-html="detail.display(props.item)"/>
-              </v-list-tile-content>
-            </v-list-tile>
-          </template>
-        </v-list>
+        <v-card-text></v-card-text>
+        <ul v-for="detail in details">
+          <li v-if="detail.display(properties.item)"
+              class="grey--text"
+              style="white-space:nowrap; text-align: left;">
+              <B>{{ detail.title }}</B> &mdash; <span v-html="detail.display(properties.item)"/>
+          </li>
+        </ul>
         <v-card-text></v-card-text>
       </v-card>
     </template>
@@ -50,8 +50,10 @@
 
   var auditLogsMap = {};
 
-  function displayRaw(auditLog) {
-    return auditLog;
+  function displayRaw(prop) {
+    return function(auditLog) {
+      return auditLog[prop];
+    };
   }
 
   function displayDate (auditLog) {
@@ -87,8 +89,39 @@
 
   const details = [
     {
-      key: 'content',
-      display: displayRaw
+      title: 'Action id',
+      key: 'actionId',
+      display: displayRaw('id')
+    },
+    {
+      title: 'Timestamp',
+      key: 'timestamp',
+      display: displayRaw('time')
+    },
+    {
+      title: 'Client IP',
+      key: 'clientIp',
+      display: displayRaw('forwardedFor')
+    },
+    {
+      title: 'Query',
+      key: 'query',
+      display: displayRaw('query')
+    },
+    {
+      title: 'Access id',
+      key: 'accessId',
+      display: displayRaw('accessId')
+    },
+    {
+      title: 'Error message',
+      key: 'errorMsg',
+      display: displayRaw('errorMessage')
+    },
+    {
+      title: 'Error id',
+      key: 'errorId',
+      display: displayRaw('errorId')
     }
   ];
 
@@ -96,21 +129,22 @@
 
   export default {
     name: 'auditLogs',
-    props: [
+    properties: [
       'onSelectProp'
     ],
+    props: {
+      auditLogs: {type: Array, default: []},
+    },
     data () {
       return {
         username: window.pryvUsername,
         UserInput :'',
-        auditLogs: this.auditLogs,
         fields: fields,
         details: details,
         pagination: {
           sortBy: 'date',
           descending: true,
           rowsPerPage: 9
-
         },
         selected: []
       }
@@ -120,7 +154,6 @@
 
     },
     created () {
-      this.auditLogs = [];
     },
     methods:{
       changeSort (column) {
@@ -136,9 +169,6 @@
         selectedItem = item;
         if (this.onSelectProp) this.onSelectProp(selectedItem);
         console.log('audit log selected ' + item.id);
-      },
-      setAuditLogs (auditLogs) {
-        this.auditLogs = auditLogs;
       }
     }
   }
