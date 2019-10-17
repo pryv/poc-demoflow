@@ -2,13 +2,22 @@
   <v-data-table
     v-model="selected"
     :headers="fields"
-    :items="accesses"
+    :items="filteredAccesses()"
     :pagination.sync="pagination"
     select-all
     item-key="id"
     class="elevation-1"
   >
     <template slot="headers" slot-scope="props">
+      <!-- Search field, deactivated for now (remove v-if to activate) -->
+      <v-text-field
+        v-if="false"
+        v-model="search"
+        append-icon="search"
+        label="Filter by access id"
+        single-line
+        hide-details
+      ></v-text-field>
       <tr>
         <th
           v-for="header in props.headers"
@@ -29,7 +38,6 @@
       </tr>
     </template>
   </v-data-table>
-
 </template>
 
 
@@ -113,6 +121,7 @@
     ],
     data () {
       return {
+        search: '',
         username: window.pryvUsername,
         UserInput :'',
         accesses: this.accesses,
@@ -142,6 +151,12 @@
       });
     },
     methods:{
+      filteredAccesses: function() {
+        if (this.search != null && this.search != '') {
+          return this.accesses.filter((a) => {return a.id.includes(this.search)});
+        }
+        return this.accesses;
+      },
       GoToRoute : function(){
         this.$router.push({ name: 'Paramdetails', params: { id: this.UserInput }})
       },
