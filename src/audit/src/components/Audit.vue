@@ -48,7 +48,8 @@
 
 <script>
 
-  var auditLogsMap = {};
+  let auditLogsMap = {};
+  const HttpStatus = require('http-status-codes');
 
   function displayRaw(prop) {
     return function(auditLog) {
@@ -57,21 +58,51 @@
   }
 
   function displayDate (auditLog) {
-    var date = new Date(auditLog.time * 1000);
+    const date = new Date(auditLog.time * 1000);
     return date.toLocaleString();
   }
 
-  function displayStatus(auditLog) {
+  function displayHTTPStatus(auditLog) {
     return auditLog.status;
   }
 
+  function displayStatus(auditLog) {
+    try {
+      const status = HttpStatus.getStatusText(auditLog.status);
+      return status;
+    } catch (err) {
+      return auditLog.status;
+    }
+  }
+
   function displayAction(auditLog) {
-    return auditLog.action;
+    const action = auditLog.action;
+    const resource = action.substring(action.indexOf("/") + 1);
+
+    const method = auditLog.action.split(' ')[0];
+    let verb;
+    switch(method) {
+      case 'GET':
+        verb = 'Retrieve';
+        break;
+      case 'POST':
+        verb = 'Create';
+        break;
+      case 'PUT':
+        verb = 'Modify';
+        break;
+      case 'DELETE':
+        verb = 'Delete';
+        break;
+      default:
+        verb = method;
+    }
+    return `${verb}: ${resource}`;
   }
 
   const fields = [
     {
-      key: 'date',
+      key: 'time',
       title: 'Date',
       display: displayDate,
     },
@@ -114,6 +145,11 @@
       display: displayRaw('accessId')
     },
     {
+      title: 'HTTP status',
+      key: 'httpStatus',
+      display: displayHTTPStatus
+    },
+    {
       title: 'Error message',
       key: 'errorMsg',
       display: displayRaw('errorMessage')
@@ -125,7 +161,7 @@
     }
   ];
 
-  var selectedItem = null;
+  let selectedItem = null;
 
   export default {
     name: 'auditLogs',
