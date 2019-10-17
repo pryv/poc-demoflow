@@ -135,6 +135,11 @@
       display: displayRaw('forwardedFor')
     },
     {
+      title: 'Action',
+      key: 'action',
+      display: displayRaw('action')
+    },
+    {
       title: 'Query',
       key: 'query',
       display: displayRaw('query')
