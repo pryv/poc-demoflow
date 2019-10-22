@@ -8,7 +8,8 @@
 # install dependencies
 yarn install
 
-# serve with hot reload at localhost:8080
+# serve dev app at:
+# localhost:8080/#/?username=USERNAME&auth=TOKENdomain=DOMAIN
 yarn run dev
 
 # build for production with minification
