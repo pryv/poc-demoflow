@@ -9,7 +9,7 @@
 yarn install
 
 # serve dev app at:
-# localhost:8080/#/?username=USERNAME&auth=TOKENdomain=DOMAIN
+# localhost:8080/#/?username=USERNAME&auth=TOKEN&domain=DOMAIN
 yarn run dev
 
 # build for production with minification
