@@ -44,7 +44,7 @@
 <script>
 
   var accessesMap = {};
-
+  const request = require('superagent');
 
   function displayType (access) {
     if (access.type === 'shared') return 'Sharing';
@@ -80,7 +80,8 @@
   }
 
   function displayDeleted(access) {
-    if (access.deleted === null) return 'Expired';
+    if (access.deleted != null) return 'Deleted';
+    if (access.expires != null) return 'Expires';
     return 'Valid';
   }
 
@@ -140,15 +141,31 @@
 
     },
     created () {
+      this.connection =  window.pryvConnection;
       var that = this;
-      window.pryvConnection.accesses.get(function (err, res ) {
+
+      const connectionSettings = this.connection.settings;
+      const auth = connectionSettings.auth;
+      const username = connectionSettings.username;
+      const domain = connectionSettings.domain;
+
+      request
+        .get(`https://${username}.${domain}/accesses`)
+        .query({includeExpired: true, includeDeletions: true})
+        .set('Authorization', auth)
+        .then(function(res) {
           if (res) {
-            that.accesses = res;
+            let accesses = res.body.accesses || [];
+            if (res.body.accessDeletions != null) accesses = accesses.concat(res.body.accessDeletions);
+            that.accesses = accesses;
             that.accesses.forEach(function (access) {
               accessesMap[access.id] = access;
             });
           }
-      });
+        })
+        .catch(function (err) {
+          console.log(err);
+        });
     },
     methods:{
       filteredAccesses: function() {

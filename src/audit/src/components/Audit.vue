@@ -183,7 +183,7 @@
         fields: fields,
         details: details,
         pagination: {
-          sortBy: 'date',
+          sortBy: 'time',
           descending: true,
           rowsPerPage: 9
         },

@@ -67,6 +67,16 @@
       key: 'modifiedBy',
       title: 'Modified By',
       display:  displayRaw('modifiedByName'),
+    },
+    {
+      key: 'deleted',
+      title: 'Deleted',
+      display:  displayRaw('deleted'),
+    },
+    {
+      key: 'expires',
+      title: 'Expires',
+      display:  displayRaw('expires'),
     }
   ];
 
@@ -79,7 +89,7 @@
 
   function displayRaw (key) {
     return function (access) {
-      return access[key];
+      return access[key] || '-';
     }
   }
 
