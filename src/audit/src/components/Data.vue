@@ -71,17 +71,18 @@
     {
       key: 'deleted',
       title: 'Deleted',
-      display:  displayRaw('deleted'),
+      display:  displayDate('deleted'),
     },
     {
       key: 'expires',
       title: 'Expires',
-      display:  displayRaw('expires'),
+      display:  displayDate('expires'),
     }
   ];
 
   function displayDate (key) {
     return function (access) {
+      if (access[key] == null) return '-';
       var date = new Date(access[key] * 1000);
       return date.toLocaleString();
     }

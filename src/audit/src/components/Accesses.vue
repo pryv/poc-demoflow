@@ -81,7 +81,11 @@
 
   function displayDeleted(access) {
     if (access.deleted != null) return 'Deleted';
-    if (access.expires != null) return 'Expires';
+    if (access.expires != null) {
+      if (new Date(access.expires*1000) < new Date()) {
+        return 'Expired';
+      }
+    }
     return 'Valid';
   }
 
