@@ -152,7 +152,7 @@
       const connectionSettings = this.connection.settings;
       const auth = connectionSettings.auth;
       const username = connectionSettings.username;
-      const serviceInfoUrl = this.connection.settings.serviceInfoUrl;
+      const serviceInfoUrl = connectionSettings.serviceInfoUrl;
 
       let serviceInfoRes;
       try {
