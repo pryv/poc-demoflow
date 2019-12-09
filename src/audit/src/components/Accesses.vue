@@ -45,6 +45,7 @@
 
   var accessesMap = {};
   const request = require('superagent');
+  const url = require('url');
 
   function displayType (access) {
     if (access.type === 'shared') return 'Sharing';
@@ -144,32 +145,46 @@
     computed: {
 
     },
-    created () {
+    async created () {
       this.connection =  window.pryvConnection;
       var that = this;
 
       const connectionSettings = this.connection.settings;
       const auth = connectionSettings.auth;
       const username = connectionSettings.username;
-      const domain = connectionSettings.domain;
+      const serviceInfoUrl = connectionSettings.serviceInfoUrl;
 
-      request
-        .get(`https://${username}.${domain}/accesses`)
-        .query({includeExpired: true, includeDeletions: true})
-        .set('Authorization', auth)
-        .then(function(res) {
-          if (res) {
-            let accesses = res.body.accesses || [];
-            if (res.body.accessDeletions != null) accesses = accesses.concat(res.body.accessDeletions);
-            that.accesses = accesses;
-            that.accesses.forEach(function (access) {
-              accessesMap[access.id] = access;
-            });
-          }
-        })
-        .catch(function (err) {
-          console.log(err);
-        });
+      let serviceInfoRes;
+      try {
+        serviceInfoRes = await request.get(serviceInfoUrl);
+      } catch (error) {
+        console.error(error);
+        return;
+      }
+      let apiUrl = serviceInfoRes.body.api;
+      if(apiUrl == null) {
+        console.error('Can\'t get api url on ' + serviceInfoUrl);
+        return;
+      }
+      apiUrl = apiUrl.replace('{username}', this.username);
+
+      let res;
+      try {
+        res = await request
+          .get(url.resolve(apiUrl, 'accesses'))
+          .query({includeExpired: true, includeDeletions: true})
+          .set('Authorization', auth)
+      } catch (error) {
+        console.log(error);
+        return;
+      }
+
+      let accesses = res.body.accesses || [];
+      if (res.body.accessDeletions != null) accesses = accesses.concat(res.body.accessDeletions);
+      that.accesses = accesses;
+      that.accesses.forEach(function (access) {
+        accessesMap[access.id] = access;
+      });
     },
     methods:{
       filteredAccesses: function() {

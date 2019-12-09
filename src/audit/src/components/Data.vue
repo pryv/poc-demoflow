@@ -36,6 +36,8 @@
   import marked from 'marked';
   import request from 'superagent';
 
+  const url = require('url');
+
   // ----- Access detail ------ //
   const details = [
     {
@@ -139,19 +141,34 @@
         access: this.selectedAccess,
         connection: this.connection,
         state: 'loading',
-        details: details
+        details: details,
+        apiUrl: ''
       }
     },
     computed: {
 
     },
-    created () {
+    async created () {
       this.access = null;
       this.connection =  window.pryvConnection;
       this.state = 'ok';
+
+      const serviceInfoUrl = this.connection.settings.serviceInfoUrl;
+      let serviceInfoRes;
+      try {
+        serviceInfoRes = await request.get(serviceInfoUrl);
+      } catch (error) {
+        console.error(error);
+        return;
+      }
+      this.apiUrl = serviceInfoRes.body.api;
+      if(this.apiUrl == null) {
+        console.error('Can\'t get api url on ' + serviceInfoUrl);
+        return;
+      }
     },
     methods:{
-      selectAccess : function(access){
+      selectAccess : async function(access){
         console.log('Data selected Access:' + access.name);
         this.access = access;
 
@@ -168,25 +185,29 @@
         const connectionSettings = this.connection.settings;
         const auth = connectionSettings.auth;
         const username = connectionSettings.username;
-        const domain = connectionSettings.domain;
 
-        request
-          .get(`https://${username}.${domain}/audit/logs?accessId=${access.id}`)
-          .set('Authorization', auth)
-          .then(function(res) {
-            const logs = res.body.auditLogs;
-            self.auditLogsMap[access.id] = logs;
-            self.auditLogs = logs;
-            self.state = 'ok';
-          })
-          .catch(function (err) {
-            console.log(err);
-            self.state = 'nok';
-          });
+        if(this.apiUrl == null) {
+          console.error('apiUrl is not set');
+          return;
+        }
+        const apiEndpoint = this.apiUrl.replace('{username}', username);
+        const auditUrl = url.resolve(apiEndpoint, '/audit/logs');
+
+        let res;
+        try {
+          res = await request.get(auditUrl)
+            .set('Authorization', auth)
+            .query({accessId: access.id});
+        } catch (error) {
+          console.log(error);
+          self.state = 'nok';
+          return;
+        }
+        const logs = res.body.auditLogs;
+        self.auditLogsMap[access.id] = logs;
+        self.auditLogs = logs;
+        self.state = 'ok';
       }
     }
   }
-
-
-
 </script>

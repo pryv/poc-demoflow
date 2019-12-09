@@ -22,7 +22,6 @@
 </template>
 
 <script>
-  import Pryv from 'pryv';
   export default {
     name: 'app',
     data () {
@@ -39,24 +38,21 @@
     },
     created () {
       window.pryvUsername =  this.$route.query.username || null;
-      if (window.pryvUsername ) {
-        var pryvConnection = new Pryv.Connection({
-          username: window.pryvUsername,
-          auth: this.$route.query.auth,
-          domain: this.$route.query.domain ||'pryv.me',
-        });
-        var that = this;
-        pryvConnection.fetchStructure(function (error, result) {
-          if (result) {
-            that.state2 = 'ok';
-            console.log('ok');
-            window.pryvConnection = pryvConnection;
-          } else {
-            that.state2 = 'nok';
-          }
-        });
+      if (window.pryvUsername == null) {
+        console.error('username is not set');
+        return;
       }
+      const pryvConnection = {
+        'settings': {
+          'auth': this.$route.query.auth,
+          'username': window.pryvUsername,
+          'serviceInfoUrl': this.$route.query.serviceInfoUrl
+        }
+      };
 
+      window.pryvConnection = pryvConnection;
+      this.state2 = 'ok';
+      console.log('ok');
     }
   }
 </script>
