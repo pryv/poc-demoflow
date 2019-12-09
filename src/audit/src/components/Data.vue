@@ -153,8 +153,7 @@
       this.connection =  window.pryvConnection;
       this.state = 'ok';
 
-      const domain = this.connection.settings.domain;
-      const serviceInfoUrl = 'https://reg.' + domain + '/service/info';
+      const serviceInfoUrl = this.connection.settings.serviceInfoUrl;
       let serviceInfoRes;
       try {
         serviceInfoRes = await request.get(serviceInfoUrl);
@@ -192,13 +191,15 @@
           return;
         }
         const apiEndpoint = this.apiUrl.replace('{username}', username);
-        const auditUrl = url.resolve(apiEndpoint, '/audit/logs?accessId=' + access.id);
+        const auditUrl = url.resolve(apiEndpoint, '/audit/logs');
 
         let res;
         try {
-          res = await request.get(auditUrl).set('Authorization', auth);
+          res = await request.get(auditUrl)
+            .set('Authorization', auth)
+            .query({accessId: access.id});
         } catch (error) {
-          console.log(err);
+          console.log(error);
           self.state = 'nok';
           return;
         }

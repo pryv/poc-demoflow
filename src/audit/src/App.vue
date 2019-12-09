@@ -46,13 +46,13 @@
         'settings': {
           'auth': this.$route.query.auth,
           'username': window.pryvUsername,
-          'domain': this.$route.query.domain ||'pryv.me'
+          'serviceInfoUrl': this.$route.query.serviceInfoUrl
         }
       };
 
+      window.pryvConnection = pryvConnection;
       this.state2 = 'ok';
       console.log('ok');
-      window.pryvConnection = pryvConnection;
     }
   }
 </script>

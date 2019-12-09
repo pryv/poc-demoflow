@@ -152,8 +152,7 @@
       const connectionSettings = this.connection.settings;
       const auth = connectionSettings.auth;
       const username = connectionSettings.username;
-      const domain = connectionSettings.domain;
-      const serviceInfoUrl = 'https://reg.' + domain + '/service/info';
+      const serviceInfoUrl = this.connection.settings.serviceInfoUrl;
 
       let serviceInfoRes;
       try {
