@@ -100,10 +100,10 @@
       campaignPatient: {url: 'https://pryv.github.io/app-web-campaign-manager/#/patientAccount?pryvUsername=' + settings.connection.username + '&pryvToken=' + settings.connection.auth},
       campaignManager: {url: "https://pryv.github.io/app-web-campaign-manager/"},
       last20: {url: ""},
-      auditPage: {url: './audit/#/?username='+ settings.connection.username + '&serviceInfoUrl=' + settings.serviceInfoUrl + '&auth=' +  settings.connection.auth},
+      auditPage: {url: './audit/#/?username='+ settings.connection.username + '&serviceInfoUrl=' + settings.connection.settings.serviceInfoUrl + '&auth=' +  settings.connection.auth},
       blueButton: {url: "https://bluebutton.pryv.me/"}
     };
-
+    
     // if this user as a campaignManger account (fetch by checkAndLoadCampaignManagerAccount)
     if (settings.campaignManager) {
       pages.campaignManager.url += "#/account?username=" + settings.campaignManager.username + "&token=" + settings.campaignManager.token;
@@ -208,6 +208,7 @@
       appId: 'pryv-demo'
     }, function(error, connection) {
 
+      connection.serviceInfoUrl = 'https://reg.' + settings.domain + '/service/info';
       setConnection(connection);
       setPersonalTokenAsDomainCookie(username, connection.settings.auth, settings.domain, 'pryv-demo');
     });
