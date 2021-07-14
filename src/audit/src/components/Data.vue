@@ -34,9 +34,6 @@
 
 
   import marked from 'marked';
-  import request from 'superagent';
-
-  const url = require('url');
 
   // ----- Access detail ------ //
   const details = [
@@ -142,7 +139,6 @@
         connection: this.connection,
         state: 'loading',
         details: details,
-        apiUrl: ''
       }
     },
     computed: {
@@ -152,20 +148,6 @@
       this.access = null;
       this.connection =  window.pryvConnection;
       this.state = 'ok';
-
-      const serviceInfoUrl = this.connection.settings.serviceInfoUrl;
-      let serviceInfoRes;
-      try {
-        serviceInfoRes = await request.get(serviceInfoUrl);
-      } catch (error) {
-        console.error(error);
-        return;
-      }
-      this.apiUrl = serviceInfoRes.body.api;
-      if(this.apiUrl == null) {
-        console.error('Can\'t get api url on ' + serviceInfoUrl);
-        return;
-      }
     },
     methods:{
       selectAccess : async function(access){
@@ -180,33 +162,23 @@
         }
 
         this.state = 'loading';
-        let self = this;
+        
 
-        const connectionSettings = this.connection.settings;
-        const auth = connectionSettings.auth;
-        const username = connectionSettings.username;
-
-        if(this.apiUrl == null) {
-          console.error('apiUrl is not set');
-          return;
-        }
-        const apiEndpoint = this.apiUrl.replace('{username}', username);
-        const auditUrl = url.resolve(apiEndpoint, '/audit/logs');
+        this.connection = window.pryvConnection;
 
         let res;
         try {
-          res = await request.get(auditUrl)
-            .set('Authorization', auth)
-            .query({accessId: access.id});
+          res = await this.connection.getRaw('/audit/logs', {accessId: access.id});
         } catch (error) {
           console.log(error);
-          self.state = 'nok';
+          this.state = 'nok';
           return;
         }
+        console.log('Audit data:', res.body);
         const logs = res.body.auditLogs;
-        self.auditLogsMap[access.id] = logs;
-        self.auditLogs = logs;
-        self.state = 'ok';
+        this.auditLogsMap[access.id] = logs;
+        this.auditLogs = logs;
+        this.state = 'ok';
       }
     }
   }

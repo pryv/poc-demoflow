@@ -44,8 +44,6 @@
 <script>
 
   var accessesMap = {};
-  const request = require('superagent');
-  const url = require('url');
 
   function displayType (access) {
     if (access.type === 'shared') return 'Sharing';
@@ -147,42 +145,19 @@
     },
     async created () {
       this.connection =  window.pryvConnection;
-      var that = this;
-
-      const connectionSettings = this.connection.settings;
-      const auth = connectionSettings.auth;
-      const username = connectionSettings.username;
-      const serviceInfoUrl = connectionSettings.serviceInfoUrl;
-
-      let serviceInfoRes;
-      try {
-        serviceInfoRes = await request.get(serviceInfoUrl);
-      } catch (error) {
-        console.error(error);
-        return;
-      }
-      let apiUrl = serviceInfoRes.body.api;
-      if(apiUrl == null) {
-        console.error('Can\'t get api url on ' + serviceInfoUrl);
-        return;
-      }
-      apiUrl = apiUrl.replace('{username}', this.username);
-
       let res;
       try {
-        res = await request
-          .get(url.resolve(apiUrl, 'accesses'))
-          .query({includeExpired: true, includeDeletions: true})
-          .set('Authorization', auth)
+        res = await this.connection.get('accesses')
       } catch (error) {
         console.log(error);
         return;
       }
+      console.log('Access', res);
 
-      let accesses = res.body.accesses || [];
-      if (res.body.accessDeletions != null) accesses = accesses.concat(res.body.accessDeletions);
-      that.accesses = accesses;
-      that.accesses.forEach(function (access) {
+      let accesses = res.accesses || [];
+      if (res.accessDeletions != null) accesses = accesses.concat(res.accessDeletions);
+      this.accesses = accesses;
+      this.accesses.forEach(function (access) {
         accessesMap[access.id] = access;
       });
     },

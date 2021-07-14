@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div v-if="username == null">
-      Missing username or valid token
+      Missing pryvApiEndpoint
     </div>
     <div v-else>
       <div v-if="state == 'loading'">
@@ -22,12 +22,16 @@
 </template>
 
 <script>
+import Pryv from 'pryv';
+
   export default {
     name: 'app',
     data () {
+    
+
       console.log("*" + window.pryvUsername  + "*");
       return {
-        username: this.$route.query.username,
+        username: window.pryvUsername,
         state2: 'loading'
       }
     },
@@ -36,23 +40,20 @@
         return this.state2
       }
     },
-    created () {
-      window.pryvUsername =  this.$route.query.username || null;
-      if (window.pryvUsername == null) {
-        console.error('username is not set');
-        return;
-      }
-      const pryvConnection = {
-        'settings': {
-          'auth': this.$route.query.auth,
-          'username': window.pryvUsername,
-          'serviceInfoUrl': this.$route.query.serviceInfoUrl
-        }
-      };
+    async created () {
+      
+        window.pryvApiEndpoint =  this.$route.query.pryvApiEndpoint || null;
+      if (window.pryvApiEndpoint == null) {
+        console.error('pryvApiEndpoint is not set');
 
+      }
+      const pryvConnection = new Pryv.Connection(window.pryvApiEndpoint);
       window.pryvConnection = pryvConnection;
+      window.pryvUsername = await pryvConnection.username();
+      this.username = window.pryvUsername;
+      
       this.state2 = 'ok';
-      console.log('ok');
+      console.log('ok', pryvConnection);
     }
   }
 </script>
