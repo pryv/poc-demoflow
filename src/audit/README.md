@@ -27,4 +27,4 @@ npm install rec-la -g
 rec-la-proxy localhost:8081 8082
 ```
 
-open https://l.rec.la:8081
+open https://l.rec.la:8081?pryvApiEndpoint=....

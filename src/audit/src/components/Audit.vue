@@ -51,53 +51,44 @@
   let auditLogsMap = {};
   const HttpStatus = require('http-status-codes');
 
-  function displayRaw(prop) {
-    return function(auditLog) {
-      return auditLog[prop];
-    };
-  }
+
 
   function displayDate (auditLog) {
     const date = new Date(auditLog.time * 1000);
     return date.toLocaleString();
   }
 
-  function displayHTTPStatus(auditLog) {
-    return auditLog.status;
-  }
 
-  function displayStatus(auditLog) {
-    try {
-      const status = HttpStatus.getStatusText(auditLog.status);
-      return status;
-    } catch (err) {
-      return auditLog.status;
-    }
-  }
 
   function displayAction(auditLog) {
-    const action = auditLog.action;
-    const resource = action.substring(action.indexOf("/") + 1);
+    return auditLog.content && auditLog.content.action || auditLog.action;
+  }
 
-    const method = auditLog.action.split(' ')[0];
-    let verb;
-    switch(method) {
-      case 'GET':
-        verb = 'Retrieve';
-        break;
-      case 'POST':
-        verb = 'Create';
-        break;
-      case 'PUT':
-        verb = 'Modify';
-        break;
-      case 'DELETE':
-        verb = 'Delete';
-        break;
-      default:
-        verb = method;
+  function displaySource(auditLog) {
+    return auditLog.content && auditLog.content.source || auditLog.forwardedFor;
+  }
+
+  function displayQuery(auditLog) {
+    return auditLog.content && auditLog.content.query;
+  }
+
+  function displayOthers(auditLog) {
+    const others = Object.assign({}, auditLog);
+    Object.assign(others, auditLog.content);
+    delete others.content;
+    delete others.time;
+    delete others.created;
+    delete others.modified;
+    delete others.modifiedBy;
+    delete others.streamIds;
+    delete others.query; 
+    delete others.action;
+    delete others.source;
+    let res = '';
+    for (const key of Object.keys(others)) {
+      res += '<BR>&nbsp;<B>' + key + ': </B>' + others[key] ;
     }
-    return `${verb}: ${resource}`;
+    return res;
   }
 
   const fields = [
@@ -112,57 +103,22 @@
       display: displayAction
     },
     {
-      key: 'status',
-      title: 'Status',
-      display: displayStatus
+      key: 'source',
+      title: 'Source',
+      display: displaySource
     }
     ];
 
   const details = [
-    {
-      title: 'Action id',
-      key: 'actionId',
-      display: displayRaw('id')
-    },
-    {
-      title: 'Timestamp',
-      key: 'timestamp',
-      display: displayRaw('time')
-    },
-    {
-      title: 'Client IP',
-      key: 'clientIp',
-      display: displayRaw('forwardedFor')
-    },
-    {
-      title: 'Action',
-      key: 'action',
-      display: displayRaw('action')
-    },
-    {
-      title: 'Query',
+   {
+      title: 'query',
       key: 'query',
-      display: displayRaw('query')
+      display: displayQuery
     },
     {
-      title: 'Access id',
-      key: 'accessId',
-      display: displayRaw('accessId')
-    },
-    {
-      title: 'HTTP status',
-      key: 'httpStatus',
-      display: displayHTTPStatus
-    },
-    {
-      title: 'Error message',
-      key: 'errorMsg',
-      display: displayRaw('errorMessage')
-    },
-    {
-      title: 'Error id',
-      key: 'errorId',
-      display: displayRaw('errorId')
+      title: 'Others',
+      key: 'others',
+      display: displayOthers
     }
   ];
 
