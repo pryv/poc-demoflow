@@ -14,7 +14,7 @@
             src="https://code.jquery.com/jquery-3.3.1.min.js"
             integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
             crossorigin="anonymous"></script>
-    <script type="text/javascript" src="https://api.pryv.com/lib-js/pryv.js"></script>
+            <script type="text/javascript" src="https://api.pryv.com/lib-javascript/latest/pryv.js"></script>
 </head>
 <style type="text/css">
     html, body {
@@ -99,7 +99,7 @@
       campaignPatient: {url: 'https://pryv.github.io/app-web-campaign-manager/#/patientAccount?pryvUsername=' + settings.connection.username + '&pryvToken=' + settings.connection.auth},
       campaignManager: {url: "https://pryv.github.io/app-web-campaign-manager/"},
       last20: {url: ""},
-      auditPage: {url: './audit/#/?username='+ settings.connection.username + '&serviceInfoUrl=' + settings.connection.settings.serviceInfoUrl + '&auth=' +  settings.connection.auth},
+      auditPage: {url: './audit/#/?pryvApiEndpoint=https://'+settings.connection.auth+ '@'+ settings.connection.username + '.' + settings.domain  },
       blueButton: {url: "https://bluebutton.pryv.me/"}
     };
     
@@ -125,7 +125,7 @@
           src="' + pages[key].url + '"> \
           </iframe>'
 
-        console.log('added page: ' + key);
+        console.log('added page: ' + key + ' => ' + pages[key].url);
       }
     }
   }
