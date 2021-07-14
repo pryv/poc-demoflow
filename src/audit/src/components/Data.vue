@@ -168,14 +168,15 @@
 
         let res;
         try {
-          res = await this.connection.getRaw('/audit/logs', {accessId: access.id});
+          res = await this.connection.getRaw('audit/logs', {accessId: access.id});
         } catch (error) {
           console.log(error);
           this.state = 'nok';
           return;
         }
-        console.log('Audit data:', res.body);
+        
         const logs = res.body.auditLogs;
+        console.log('Audit data:', logs);
         this.auditLogsMap[access.id] = logs;
         this.auditLogs = logs;
         this.state = 'ok';
