@@ -52,7 +52,7 @@
       return 'Device & App';
     }
     if (access.type == 'personal') return 'Management tools';
-    return 'Unknown';
+    return access.type;
   }
 
   function displayRaw (key) {
@@ -70,6 +70,7 @@
 
   function displayBy (key) {
     return function (access) {
+      if (! access[key]) return key;
       if (access[key] === 'system') return 'System or Owner';
       if (accessesMap[access[key]]) {
         return accessesMap[access[key]].name;
@@ -147,15 +148,51 @@
       this.connection =  window.pryvConnection;
       let res;
       try {
-        res = await this.connection.get('accesses')
+        res = await this.connection.get('accesses', {includeExpired: true, includeDeletions: true})
       } catch (error) {
         console.log(error);
         return;
       }
-      console.log('Access', res);
+      
+
+     
 
       let accesses = res.accesses || [];
+
+      accesses.unshift({
+        created: Date.now() / 1000,
+        lastUsed: Date.now() / 1000,
+        type: 'system',
+        id: 'valid-password',
+        name: 'VALID PASSWORD'
+      });
+
+      accesses.unshift({
+        created: Date.now() / 1000,
+        lastUsed: Date.now() / 1000,
+        type: 'system',
+        id: 'password-reset-request',
+        name: 'PASSWORD RESET REQUEST'
+      });
+
+      accesses.unshift({
+        created: Date.now() / 1000,
+        lastUsed: Date.now() / 1000,
+        type: 'system',
+        id: 'admin',
+        name: 'ADMIN'
+      });
+
+      accesses.unshift({
+        created: Date.now() / 1000,
+        lastUsed: Date.now() / 1000,
+        type: 'system',
+        id: 'invalid',
+        name: 'INVALID'
+      });
+     
       if (res.accessDeletions != null) accesses = accesses.concat(res.accessDeletions);
+       console.log('Accesses', accesses);
       this.accesses = accesses;
       this.accesses.forEach(function (access) {
         accessesMap[access.id] = access;

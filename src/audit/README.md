@@ -9,7 +9,7 @@
 yarn install
 
 # serve dev app at:
-# localhost:8080/#/?username=USERNAME&auth=TOKEN&serviceInfoUrl=SERVICE_INFO_URL
+# localhost:8080/#/?pryvApiEndpoint=...
 yarn run dev
 
 # build for production with minification

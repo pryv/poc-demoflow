@@ -65,6 +65,7 @@
   }
 
   function displaySource(auditLog) {
+    if (auditLog.content && auditLog.content.source && auditLog.content.source.ip) return auditLog.content.source.ip;
     return auditLog.content && auditLog.content.source || auditLog.forwardedFor;
   }
 

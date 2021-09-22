@@ -117,7 +117,7 @@
 
   function displayPermission(access) {
     if (access.type === 'personal') return 'System or Owner';
-    return access.permissions;
+    return JSON.stringify(access.permissions, null, 2);
   }
 
   // ----- Audit ------------- //
@@ -168,7 +168,7 @@
 
         let res;
         try {
-          res = await this.connection.getRaw('audit/logs', {accessId: access.id});
+          res = await this.connection.getRaw('audit/logs', {streams: [':_audit:access-' + access.id] });
         } catch (error) {
           console.log(error);
           this.state = 'nok';
