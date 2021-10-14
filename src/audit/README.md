@@ -24,7 +24,7 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
 ### Use rec.la proxy: 
 ```
 npm install rec-la -g
-rec-la-proxy localhost:8081 8082
+rec-la-proxy localhost:8080 8082
 ```
 
 open https://l.rec.la:8081?pryvApiEndpoint=....

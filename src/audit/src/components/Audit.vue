@@ -87,7 +87,13 @@
     delete others.source;
     let res = '';
     for (const key of Object.keys(others)) {
-      res += '<BR>&nbsp;<B>' + key + ': </B>' + others[key] ;
+      if (typeof others[key] === 'Object') {
+        for (const rkey of Object.keys(others[key])) {
+          res += '<BR>&nbsp;<B>' + key + '.' + rkey +': </B>' + others[key][rkey] ;
+        }
+      } else {
+        res += '<BR>&nbsp;<B>' + key + ': </B>' + others[key] ;
+      }
     }
     return res;
   }
