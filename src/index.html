@@ -9,7 +9,7 @@
           integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
           crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400">
-    <link rel="stylesheet" type="text/css" href="https://api.pryv.com/style/pryv.min.css">  
+    <link rel="stylesheet" type="text/css" href="https://api.pryv.com/style/pryv.min.css">
     <script
             src="https://code.jquery.com/jquery-3.3.1.min.js"
             integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
@@ -95,14 +95,14 @@
       },
         browser: {url: 'https://pryv.github.io/app-web/?username='+ settings.connection.username + '&domain=' + settings.domain + '&personalToken=' +  settings.connection.auth},
       //  browser: {url: 'https://l.rec.la:5443/?username='+ settings.connection.username + '&domain=' + settings.domain + '&personalToken=' +  settings.connection.auth},
-      plotly: {url: 'https://pryv.github.io/app-web-plotly/?username='+ settings.connection.username + '&domain=' + settings.domain + '&auth=' +  settings.connection.auth},
+      plotly: {url: 'https://pryv.github.io/poc-plotly/?username='+ settings.connection.username + '&domain=' + settings.domain + '&auth=' +  settings.connection.auth},
       campaignPatient: {url: 'https://camp.pryv.me/#/patientAccount?pryvUsername=' + settings.connection.username + '&pryvToken=' + settings.connection.auth},
       campaignManager: {url: "https://camp.pryv.me/"},
       last20: {url: ""},
       auditPage: {url: './audit/#/?pryvApiEndpoint=https://'+settings.connection.auth+ '@'+ settings.connection.username + '.' + settings.domain  },
       blueButton: {url: "https://bluebutton.pryv.me/"}
     };
-    
+
     // if this user as a campaignManger account (fetch by checkAndLoadCampaignManagerAccount)
     if (settings.campaignManager) {
       pages.campaignManager.url += "#/account?username=" + settings.campaignManager.username + "&token=" + settings.campaignManager.token;

@@ -1,5 +1,5 @@
 # Pryv demonstration flow
 
-Visible on https://pryv.github.io/app-web-demoflow/ 
+Published on https://pryv.github.io/poc-demoflow/
 
 For the Audit demo, see the corresponding [README](./src/audit/README.md).
